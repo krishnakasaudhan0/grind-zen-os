@@ -68,17 +68,16 @@ export function PomodoroTimer() {
   const circumference = 2 * Math.PI * 54;
 
   return (
-    <div className="surface-card p-4 mb-6 hover-glow">
-      <div className="label-mono mb-3">🍅 POMODORO</div>
-      <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-start gap-6">
+      <div className="flex flex-col sm:flex-row items-center gap-8 w-full">
         {/* Timer circle */}
-        <div className="relative w-36 h-36">
+        <div className="relative w-32 h-32 flex-shrink-0">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="54" fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
+            <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" className="text-border/40" strokeWidth="2" />
             <motion.circle
               cx="60" cy="60" r="54" fill="none"
-              stroke={mode === 'work' ? 'hsl(var(--primary))' : 'hsl(var(--info))'}
-              strokeWidth="4"
+              stroke="currentColor" className={mode === 'work' ? 'text-primary' : 'text-info'}
+              strokeWidth="3"
               strokeLinecap="round"
               strokeDasharray={circumference}
               animate={{ strokeDashoffset: circumference * (1 - progress) }}
@@ -86,50 +85,57 @@ export function PomodoroTimer() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-mono text-3xl font-bold text-foreground tabular-nums">
+            <span className="font-sans text-3xl font-bold tracking-tight text-foreground tabular-nums">
               {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
             </span>
-            <span className={`font-mono text-xs uppercase tracking-wider ${mode === 'work' ? 'text-primary' : 'text-info'}`}>
+            <span className={`font-sans text-[10px] font-medium tracking-widest uppercase ${mode === 'work' ? 'text-primary' : 'text-info'}`}>
               {mode}
             </span>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => setRunning(r => !r)}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 text-primary font-mono text-xs uppercase tracking-wider hover-glow transition-default"
-          >
-            {running ? <Pause size={14} /> : <Play size={14} />}
-            {running ? 'PAUSE' : 'START'}
-          </button>
-          <button
-            onClick={reset}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-muted-foreground font-mono text-xs uppercase tracking-wider hover:text-foreground transition-default"
-          >
-            <RotateCcw size={14} />
-            RESET
-          </button>
-          <button
-            onClick={() => {
-              const newMode = mode === 'work' ? 'break' : 'work';
-              setMode(newMode);
-              setRunning(false);
-              setTimeLeft(newMode === 'work' ? pomodoroSettings.workDuration * 60 : pomodoroSettings.shortBreak * 60);
-            }}
-            className="px-4 py-2 rounded-md bg-secondary text-muted-foreground font-mono text-xs uppercase tracking-wider hover:text-foreground transition-default"
-          >
-            {mode === 'work' ? 'BREAK' : 'WORK'}
-          </button>
-        </div>
+        <div className="flex flex-col gap-4 flex-1 w-full">
+          {/* Controls */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setRunning(r => !r)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-primary text-primary-foreground font-sans text-sm font-medium hover:opacity-90 transition-default"
+            >
+              {running ? <Pause size={16} /> : <Play size={16} />}
+              {running ? 'Pause' : 'Start'}
+            </button>
+            <button
+              onClick={reset}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-default flex-shrink-0"
+              title="Reset"
+            >
+              <RotateCcw size={16} />
+            </button>
+            <button
+              onClick={() => {
+                const newMode = mode === 'work' ? 'break' : 'work';
+                setMode(newMode);
+                setRunning(false);
+                setTimeLeft(newMode === 'work' ? pomodoroSettings.workDuration * 60 : pomodoroSettings.shortBreak * 60);
+              }}
+              className="px-4 py-2.5 rounded-full bg-secondary text-foreground font-sans text-sm font-medium transition-default hover:bg-secondary/80 whitespace-nowrap"
+            >
+              {mode === 'work' ? 'Take Break' : 'Work Mode'}
+            </button>
+          </div>
 
-        {/* Sessions */}
-        <div className="flex gap-1 items-center">
-          {Array.from({ length: pomodoroSessionsToday }).map((_, i) => (
-            <span key={i} className="text-sm">🍅</span>
-          ))}
-          {pomodoroSessionsToday === 0 && <span className="text-xs text-muted-foreground font-mono">No sessions yet</span>}
+          {/* Sessions */}
+          <div className="flex gap-1.5 items-center">
+            {Array.from({ length: pomodoroSettings.sessionsBeforeLong }).map((_, i) => (
+              <div 
+                key={i} 
+                className={`w-2.5 h-2.5 rounded-full ${i < (pomodoroSessionsToday % pomodoroSettings.sessionsBeforeLong) ? 'bg-primary' : 'bg-secondary'}`}
+              />
+            ))}
+            <span className="text-xs text-muted-foreground ml-2 font-sans">
+               {pomodoroSessionsToday} completed
+            </span>
+          </div>
         </div>
       </div>
     </div>

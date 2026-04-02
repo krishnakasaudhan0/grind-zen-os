@@ -1,7 +1,7 @@
 import { useStore } from '@/stores/useStore';
 import { format, subDays } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Check, Plus, Minus, X } from 'lucide-react';
+import { Check, Plus, Minus, X, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 
@@ -21,7 +21,7 @@ export function HabitTracker() {
     if (allDone && !celebrated) {
       setCelebrated(true);
       updateStreak(today);
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#00ff88', '#58a6ff', '#ffa657'] });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ffffff', '#888888', '#dddddd'] });
     }
   }, [allDone, celebrated, today, updateStreak]);
 
@@ -41,122 +41,115 @@ export function HabitTracker() {
     return streak;
   };
 
-  const progressPct = habits.length > 0 ? (habitsDone / habits.length) * 100 : 0;
-
   return (
-    <div className="surface-card p-4 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="label-mono">DAILY HABITS</div>
-        <div className="flex items-center gap-3">
-          {/* Circular progress */}
-          <div className="relative w-10 h-10">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="16" fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
-              <motion.circle
-                cx="20" cy="20" r="16" fill="none"
-                stroke="hsl(var(--primary))"
-                strokeWidth="3" strokeLinecap="round"
-                strokeDasharray={100.5}
-                animate={{ strokeDashoffset: 100.5 * (1 - progressPct / 100) }}
-              />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center font-mono text-[10px] text-primary font-bold">
-              {habitsDone}/{habits.length}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-2">
+    <div>
+      <div className="space-y-1 sm:space-y-2">
         {habits.map((habit, i) => {
           const entry = todayData[habit.id] || { done: false, value: 0 };
           const streak = getStreak(habit.id);
+          
           return (
             <motion.div
               key={habit.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.03 }}
-              className={`flex items-center gap-3 p-3 rounded-md border transition-default ${
-                entry.done ? 'border-primary/30 bg-primary/5 glow-green' : 'border-border hover:border-border/80'
-              }`}
+              className={`group flex items-center gap-4 py-3 -mx-4 px-4 rounded-md transition-default border-b border-border/30 hover:bg-white/[0.02]`}
             >
-              {/* Checkbox/counter */}
-              {habit.type === 'checkbox' ? (
-                <button
-                  onClick={() => toggleHabit(today, habit.id)}
-                  className={`w-6 h-6 rounded flex items-center justify-center border transition-default ${
-                    entry.done ? 'bg-primary border-primary' : 'border-muted-foreground/40 hover:border-primary/50'
-                  }`}
-                >
-                  {entry.done && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="animate-check-bounce">
-                      <Check size={14} className="text-primary-foreground" />
-                    </motion.div>
-                  )}
-                </button>
-              ) : (
-                <div className="flex items-center gap-1">
+              <div className="flex-shrink-0">
+                {habit.type === 'checkbox' ? (
                   <button
-                    onClick={() => setHabitValue(today, habit.id, Math.max(0, entry.value - 1))}
-                    className="w-6 h-6 rounded flex items-center justify-center border border-border text-muted-foreground hover:text-foreground transition-default"
+                    onClick={() => toggleHabit(today, habit.id)}
+                    className={`w-5 h-5 rounded flex items-center justify-center border transition-default ${
+                      entry.done ? 'bg-primary border-primary' : 'border-muted-foreground/40 hover:border-primary/60'
+                    }`}
                   >
-                    <Minus size={12} />
+                    {entry.done && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                        <Check size={12} className="text-primary-foreground" />
+                      </motion.div>
+                    )}
                   </button>
-                  <span className="font-mono text-sm w-8 text-center text-foreground tabular-nums">{entry.value}</span>
-                  <button
-                    onClick={() => setHabitValue(today, habit.id, entry.value + 1)}
-                    className="w-6 h-6 rounded flex items-center justify-center border border-border text-muted-foreground hover:text-foreground transition-default"
-                  >
-                    <Plus size={12} />
-                  </button>
-                </div>
-              )}
+                ) : (
+                  <div className="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => setHabitValue(today, habit.id, Math.max(0, entry.value - 1))}
+                      className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="font-mono text-xs w-6 text-center text-foreground tabular-nums">{entry.value}</span>
+                    <button
+                      onClick={() => setHabitValue(today, habit.id, entry.value + 1)}
+                      className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
 
-              <span className="text-base">{habit.emoji}</span>
-              <span className="text-sm text-foreground flex-1">{habit.name}</span>
-              {habit.target && habit.type !== 'checkbox' && (
-                <span className="font-mono text-xs text-muted-foreground">/{habit.target}{habit.unit?.[0]}</span>
-              )}
-              {streak > 0 && (
-                <span className="font-mono text-xs text-warning">🔥{streak}d</span>
-              )}
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="text-lg leading-none">{habit.emoji}</span>
+                <span className={`text-base font-sans truncate ${entry.done ? 'text-muted-foreground line-through decoration-muted-foreground/50' : 'text-foreground'}`}>
+                  {habit.name}
+                </span>
+                {habit.target && habit.type !== 'checkbox' && (
+                  <span className="font-mono text-xs text-muted-foreground/50 whitespace-nowrap">
+                    /{habit.target}{habit.unit?.[0]}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {streak > 0 && (
+                  <span className="font-sans font-medium text-xs text-warning tracking-tight">
+                    {streak}d 🔥
+                  </span>
+                )}
+                <button
+                  onClick={() => removeHabit(habit.id)}
+                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-default"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
             </motion.div>
           );
         })}
       </div>
 
-      {/* Add habit */}
       {showAdd ? (
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-4">
           <input
             value={newEmoji}
             onChange={e => setNewEmoji(e.target.value)}
-            className="w-12 bg-secondary text-center rounded px-2 py-1.5 text-sm border border-border focus:border-primary outline-none"
+            className="w-12 bg-transparent text-center rounded-md px-2 py-2 text-base border border-border/50 focus:border-primary outline-none"
             maxLength={2}
           />
           <input
             value={newName}
             onChange={e => setNewName(e.target.value)}
             placeholder="Habit name..."
-            className="flex-1 bg-secondary rounded px-3 py-1.5 text-sm border border-border focus:border-primary outline-none text-foreground placeholder:text-muted-foreground"
+            className="flex-1 bg-transparent rounded-md px-3 py-2 text-base border border-border/50 focus:border-primary outline-none text-foreground placeholder:text-muted-foreground/50"
             onKeyDown={e => {
               if (e.key === 'Enter' && newName.trim()) {
                 addHabit({ id: Date.now().toString(), name: newName, emoji: newEmoji, type: 'checkbox' });
                 setNewName(''); setNewEmoji('⭐'); setShowAdd(false);
               }
             }}
+            autoFocus
           />
-          <button onClick={() => setShowAdd(false)} className="p-1.5 text-muted-foreground hover:text-foreground">
+          <button onClick={() => setShowAdd(false)} className="p-2 text-muted-foreground hover:text-foreground border border-border/50 rounded-md">
             <X size={16} />
           </button>
         </div>
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="mt-3 w-full py-2 rounded-md border border-dashed border-border text-muted-foreground font-mono text-xs uppercase tracking-wider hover:border-primary/50 hover:text-primary transition-default"
+          className="mt-4 w-full py-2.5 rounded-md border border-dashed border-border/30 text-muted-foreground/70 font-sans text-sm font-medium hover:border-primary/50 hover:text-foreground transition-default"
         >
-          + ADD HABIT
+          + Add Habit
         </button>
       )}
     </div>

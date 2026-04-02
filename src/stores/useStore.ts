@@ -29,6 +29,8 @@ export type Task = {
   done: boolean;
   dueDate?: string;
   timeEstimate?: string;
+  startTime?: number; // Hour of the day (0-23)
+  duration?: number; // Duration in hours
   createdAt: string;
   order: number;
 };

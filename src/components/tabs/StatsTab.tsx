@@ -105,13 +105,13 @@ export function StatsTab() {
         <span className="label-mono">WEEKLY PRODUCTIVITY</span>
         <div className="h-48 mt-3">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklyData}>
+            <LineChart data={weeklyData}>
               <XAxis dataKey="day" tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#8b949e' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#8b949e' }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="habits" fill="#00ff88" radius={[3, 3, 0, 0]} name="Habits" />
-              <Bar dataKey="tasks" fill="#58a6ff" radius={[3, 3, 0, 0]} name="Tasks" />
-            </BarChart>
+              <Line type="monotone" dataKey="habits" stroke="#00ff88" strokeWidth={2} dot={{ r: 4, fill: '#00ff88' }} activeDot={{ r: 6 }} name="Habits" />
+              <Line type="monotone" dataKey="tasks" stroke="#58a6ff" strokeWidth={2} dot={{ r: 4, fill: '#58a6ff' }} activeDot={{ r: 6 }} name="Tasks" />
+            </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
@@ -170,19 +170,19 @@ export function StatsTab() {
         {/* Activity heatmap */}
         <div className="surface-card p-4">
           <span className="label-mono">ACTIVITY HEATMAP</span>
-          <div className="mt-3 grid grid-cols-7 gap-1">
+          <div className="mt-3 grid grid-cols-7 gap-1 w-max">
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-              <span key={i} className="text-center font-mono text-[9px] text-muted-foreground mb-1">{d}</span>
+              <span key={i} className="text-center font-mono text-[9px] text-muted-foreground mb-1 w-5 h-2 flex items-center justify-center">{d}</span>
             ))}
             {heatmapDays.map((d, i) => (
               <div
                 key={i}
-                className={`aspect-square rounded-sm ${getHeatColor(d.count)} transition-default cursor-default`}
+                className={`w-5 h-5 rounded-sm ${getHeatColor(d.count)} transition-default cursor-default`}
                 title={`${d.label}: ${d.count} activities`}
               />
             ))}
           </div>
-          <div className="flex items-center gap-2 mt-3 justify-end">
+          <div className="flex items-center gap-2 mt-3 w-max justify-end">
             <span className="font-mono text-[9px] text-muted-foreground">Less</span>
             {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
               <div key={i} className={`w-3 h-3 rounded-sm ${

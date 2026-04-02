@@ -18,7 +18,6 @@ const Index = () => {
       <TasksTab />
       <ProjectsTab />
       <StatsTab />
-      <SettingsTab />
     </Layout>
   );
 };
