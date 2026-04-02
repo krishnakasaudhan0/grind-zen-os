@@ -1,16 +1,26 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useStore } from '@/stores/useStore';
+import { Layout } from '@/components/Layout';
+import { Onboarding } from '@/components/Onboarding';
+import { DailyTab } from '@/components/tabs/DailyTab';
+import { TasksTab } from '@/components/tabs/TasksTab';
+import { ProjectsTab } from '@/components/tabs/ProjectsTab';
+import { StatsTab } from '@/components/tabs/StatsTab';
+import { SettingsTab } from '@/components/tabs/SettingsTab';
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const { onboarded } = useStore();
+
+  if (!onboarded) return <Onboarding />;
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <Layout>
+      <DailyTab />
+      <TasksTab />
+      <ProjectsTab />
+      <StatsTab />
+      <SettingsTab />
+    </Layout>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
